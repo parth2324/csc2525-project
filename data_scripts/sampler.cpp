@@ -11,9 +11,7 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Usage:\n"
                   << "  " << argv[0] << " uniform    a b       n out.csv\n"
-                  << "  " << argv[0] << " normal     mu sigma n out.csv\n"
-                  << "  " << argv[0] << " exponential lambda n out.csv\n"
-                  << "  " << argv[0] << " gamma      alpha beta n out.csv\n";
+                  << "  " << argv[0] << " normal     mu sigma n out.csv\n";
         return 1;
     }
 
@@ -57,20 +55,6 @@ int main(int argc, char *argv[])
     {
         double mu = p1, sigma = p2;
         std::normal_distribution<double> dist(mu, sigma);
-        sampler = [&]
-        { return dist(gen); };
-    }
-    else if (dist_name == "exponential")
-    {
-        double lambda = p1;
-        std::exponential_distribution<double> dist(lambda);
-        sampler = [&]
-        { return dist(gen); };
-    }
-    else if (dist_name == "gamma")
-    {
-        double alpha = p1, beta = p2;
-        std::gamma_distribution<double> dist(alpha, beta);
         sampler = [&]
         { return dist(gen); };
     }
