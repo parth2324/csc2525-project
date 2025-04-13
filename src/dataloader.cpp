@@ -1,4 +1,4 @@
-#include "DataLoader.h"
+#include "dataloader.h"
 #include <algorithm>
 
 size_t DataLoader::countSamples()
