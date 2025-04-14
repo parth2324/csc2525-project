@@ -2,6 +2,7 @@
 #include <limits>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include "segment.h"
 
 // const float FLT_INF = std::numeric_limits<float>::infinity();
@@ -88,9 +89,10 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
     std::vector<std::pair<float, Segment*>> res;
     if(size == 0) return res;
     Segment* seg;
-    float *curr, st, dlt, st_up, st_dn;
+    float *curr, st, dlt, st_up, st_dn, m;
     int dup_cnt, loc, up, dn, ind = 0;
     float slup, sldn;
+    bool m_inc, m_dec;
     Make_Segment:
     while(ind < size){
         curr = (data + ind);
@@ -98,7 +100,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
         ind += 1;
         if(size - ind > 0){
             dlt = data[ind] - st;
-            // need to set st_up, st_dn, slup, sldn, loc
+            // need to set st_up, st_dn, slup, sldn, loc, avg_dlt
             dup_cnt = 0;
             while(dlt == 0 && ind < size){
                 dlt = data[ind] - st;
@@ -107,11 +109,10 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
             }
             if(dup_cnt > 0){
                 // our start has duplicates, need custom ranging
-                if((err << 1) < dup_cnt){
-                    // valid range: ind - E + dup_cnt to ind + E
+                if(err < dup_cnt){
                     // not possible to include all, cut losses
-                    ind -= (dup_cnt - (err << 1));
-                    dup_cnt = err << 1;
+                    ind -= (dup_cnt - err);
+                    dup_cnt = err;
                     seg = new Segment(curr, dup_cnt + 1, data[ind - dup_cnt - 1], 0);
                     res.emplace_back(data[ind - 1], seg);
                     goto Make_Segment;
@@ -122,8 +123,8 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
                     st_dn = dup_cnt - err;
                     dlt = data[ind] - st;
                     loc = dup_cnt + 1;
-                    slup = (err + 1 - st_up) / dlt;
-                    sldn = (err - 1 - st_dn) / dlt;
+                    slup = (err + 1 - st_dn) / dlt;
+                    sldn = (err - 1 - st_up) / dlt;
                 }
                 else{
                     // got everything possible
@@ -137,25 +138,47 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
                 // no dups, easy start
                 st_up = err;
                 st_dn = -err;
-                slup = 1.0 / dlt;
-                sldn = slup;
+                slup = (err + 1 - st_dn) / dlt;
+                sldn = (err - 1 - st_up) / dlt;
                 ind += 1;
                 loc = 2;
             }
             std::cout << "--------------------\n";
-            if(size - ind == 1) break;
             while(ind < size){
                 dlt = data[ind] - st;
-                up = (int)(slup * dlt) + st_up;
-                dn = (int)(sldn * dlt) + st_dn;
+                up = round(slup * dlt) + st_dn;
+                dn = round(sldn * dlt) + st_up;
                 std::cout << "y: " << loc << ", y_high: " << up << ", y_low: " << dn << ", slup: " << slup << ", sldn: " << sldn << ", stup: " << st_up << ", stdn: " << st_dn << "\n";
                 if(loc - err > up || loc + err < dn){
-                    seg = new Segment(curr, loc, data[ind - loc], (slup + sldn) / 2);
-                    res.emplace_back(data[ind - 1], seg);
+                    m = (slup + sldn) / 2;
+                    int i = ind - loc, j, prd;
+                    m_inc = false;
+                    m_dec = false;
+                    for(j = 0; i < ind; j++, i++){
+                        dlt = data[i] - st;
+                        prd = round(m*dlt);
+                        if(j - err > prd){
+                            if(m_dec) break;
+                            m = (j - err) / dlt;
+                            m_inc = true;
+                        }
+                        if(j + err < prd){
+                            if(m_inc) break;
+                            m = (j + err) / dlt;
+                            m_dec = true;
+                        }
+                    }
+                    seg = new Segment(curr, j, st, m);
+                    res.emplace_back(data[i - 1], seg);
+                    if(i < ind){
+                        // break computed segment :(
+                        std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << "% of total)\n";
+                        ind = i;
+                    }
                     break;
                 }
-                if(loc + err < up) slup = (loc + err - st_up) / dlt;
-                if(loc - err > dn) sldn = (loc - err - st_dn) / dlt;
+                if(loc + err < up) slup = (loc + err - st_dn) / dlt;
+                if(loc - err > dn) sldn = (loc - err - st_up) / dlt;
                 ind += 1;
                 loc += 1;
             }
@@ -167,7 +190,37 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
             break;
         }
     }
-    seg = new Segment(curr, loc, data[ind - loc], (slup + sldn) / 2);
-    res.emplace_back(data[ind - 1], seg);
+    m = (slup + sldn) / 2;
+    if(loc > 2){
+        int i = ind - loc, j, prd;
+        m_inc = false;
+        m_dec = false;
+        for(j = 0; i < ind; j++, i++){
+            dlt = data[i] - st;
+            prd = round(m*dlt);
+            if(j - err > prd){
+                if(m_dec) break;
+                m = (j - err) / dlt;
+                m_inc = true;
+            }
+            if(j + err < prd){
+                if(m_inc) break;
+                m = (j + err) / dlt;
+                m_dec = true;
+            }
+        }
+        seg = new Segment(curr, j, st, m);
+        res.emplace_back(data[i - 1], seg);
+        if(i < ind){
+            // break computed segment :(
+            std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << "% of total)\n";
+            ind = i;
+            goto Make_Segment;
+        }
+    }
+    else{
+        seg = new Segment(curr, loc, st, m);
+        res.emplace_back(data[ind - 1], seg);
+    }
     return res;
 }

@@ -5,8 +5,16 @@
 #include "ktree.h"
 #include "segment.h"
 
-int gen_func(int ind){
-    return ind * ind;
+float gen_func(int ind){
+    // if(ind <= 11) return ind * ind * ind;
+    // ind -= 11;
+    // return (11 * 11 * 11) + (ind * ind * ind);
+    float v = 3 * ind + 2;
+    if(ind < 7){
+        return ind / v;
+    }
+    ind -= 6;
+    return ((ind + 6) / v) + (ind * ind * ind);
 }
 
 float* gen_edgecase(int E, int N){
@@ -48,9 +56,21 @@ int main(int argc, char *argv[])
     // {
     //     vals[i] = gen_func(i);
     // }
-    int N = 5;
-    NUM_VALS = 4 + (N * (MAX_ERR + 2));
-    float* vals = gen_edgecase(MAX_ERR, N);
+
+    float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
+    int rep_cnt = 0.3 * NUM_VALS;
+    for (int i = 0; i < rep_cnt; i++)
+    {
+        vals[i] = 1;
+    }
+    for (int i = rep_cnt; i < NUM_VALS; i++)
+    {
+        vals[i] = 1+ gen_func(i);
+    }
+
+    // int N = 5;
+    // NUM_VALS = 4 + (N * (MAX_ERR + 2));
+    // float* vals = gen_edgecase(MAX_ERR, N);
     // for (int i = 0; i < NUM_VALS; i++)
     // {
     //     std::cout << vals[i] << "\n";
