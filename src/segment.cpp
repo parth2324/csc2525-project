@@ -44,7 +44,7 @@ void print_segment(Segment* segment, std::ofstream& stream){
     }
 }
 
-std::vector<std::pair<float, Segment*>> gen_segments_cone(float* data, int size, int E){ // fix by diff
+std::vector<std::pair<float, Segment*>> gen_segments_cone(float* data, int size, int E){
     std::vector<std::pair<float, Segment*>> res;
     if(size == 0) return res;
     Segment* seg;
