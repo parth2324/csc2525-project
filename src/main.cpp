@@ -5,9 +5,27 @@
 #include "ktree.h"
 #include "segment.h"
 
-int gen_func(int ind)
-{
+int gen_func(int ind){
     return ind * ind;
+}
+
+float* gen_edgecase(int E, int N){
+    float x1 = 10, half_e = E / 2.0, inv_e = 1.0 / E, x_curr;
+    float* vals = (float*) malloc(sizeof(float) * (4 + (N * (E + 2))));
+    int ind = 3;
+    vals[0] = x1;
+    vals[1] = x1 + half_e;
+    vals[2] = x1 + E;
+    x_curr = x1 + E + inv_e;
+    for(int i = 0; i < N; i++, ind++){
+        for(int j = 0; j <= E; j++, ind++){
+            vals[ind] = x_curr;
+        }
+        vals[ind] = x_curr + inv_e;
+        x_curr = vals[ind] + E;
+    }
+    vals[ind] = x_curr - half_e;
+    return vals;
 }
 
 int main(int argc, char *argv[])
@@ -25,13 +43,20 @@ int main(int argc, char *argv[])
     NUM_VALS = std::stoi(argv[1]);
     MAX_ERR = std::stoi(argv[2]);
 
-    int *vals = (int *)malloc(sizeof(int) * NUM_VALS);
-    for (int i = 0; i < NUM_VALS; i++)
-    {
-        vals[i] = gen_func(i);
-    }
+    // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
+    // for (int i = 0; i < NUM_VALS; i++)
+    // {
+    //     vals[i] = gen_func(i);
+    // }
+    int N = 5;
+    NUM_VALS = 4 + (N * (MAX_ERR + 2));
+    float* vals = gen_edgecase(MAX_ERR, N);
+    // for (int i = 0; i < NUM_VALS; i++)
+    // {
+    //     std::cout << vals[i] << "\n";
+    // }
 
-    std::vector<std::pair<int, Segment *>> data = gen_segments_cone(vals, NUM_VALS, MAX_ERR);
+    std::vector<std::pair<float, Segment *>> data = gen_segments_irng(vals, NUM_VALS, MAX_ERR);
     Segment *seg;
 
     std::ofstream stream("seg_out.txt");

@@ -9,7 +9,7 @@ def read_segments(filename):
                 slope = float(file.readline().strip())
                 arr = [0 for _ in range(arr_len)]
                 for i in range(arr_len):
-                    arr[i] = int(file.readline().strip())
+                    arr[i] = float(file.readline().strip())
                 result.append((slope, arr))
             except Exception as e:
                 # Break the loop if we encounter any error (likely EOF)
@@ -37,6 +37,7 @@ def plot_segment_fit(segment, slope, error_lines=True):
 
 
 collec = read_segments("seg_out.txt")
+print("Number of segements read:", len(collec))
 for slp, seg in collec:
     plot_segment_fit(seg, slp, True)
 
