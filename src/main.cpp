@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
     NUM_VALS = std::stoi(argv[1]);
     MAX_ERR = std::stoi(argv[2]);
 
-    float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
-    for (int i = 0; i < NUM_VALS; i++)
-    {
-        vals[i] = gen_func(i);
-    }
+    // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
+    // for (int i = 0; i < NUM_VALS; i++)
+    // {
+    //     vals[i] = gen_func(i);
+    // }
 
     // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
     // int rep_cnt = 0.7 * NUM_VALS;
@@ -68,30 +68,45 @@ int main(int argc, char *argv[])
     //     vals[i] = 1+ gen_func(i);
     // }
 
-    // int N = 5;
-    // NUM_VALS = 4 + (N * (MAX_ERR + 2));
-    // float* vals = gen_edgecase(MAX_ERR, N);
-    // for (int i = 0; i < NUM_VALS; i++)
-    // {
-    //     std::cout << vals[i] << "\n";
-    // }
+    int N = 5;
+    NUM_VALS = 4 + (N * (MAX_ERR + 2));
+    float* vals = gen_edgecase(MAX_ERR, N);
+    for (int i = 0; i < NUM_VALS; i++)
+    {
+        std::cout << vals[i] << "\n";
+    }
 
-    std::vector<std::pair<float, Segment *>> data = gen_segments_dcone(vals, NUM_VALS, MAX_ERR);
+    std::vector<std::pair<float, Segment *>> cone_data = gen_segments_cone(vals, NUM_VALS, MAX_ERR);
+    std::vector<std::pair<float, Segment *>> dcone_data = gen_segments_dcone(vals, NUM_VALS, MAX_ERR);
     Segment *seg;
 
-    std::ofstream stream("seg_out.txt");
-    if (!stream)
+    std::ofstream cone_stream("seg_cone_out.txt");
+    if (!cone_stream)
     {
         std::cerr << "Error opening file for writing!\n";
         return 1;
     }
 
-    for (auto &[k, ptr] : data)
+    for (auto &[k, ptr] : cone_data)
     {
-        print_segment(ptr, stream);
+        print_segment(ptr, cone_stream);
     }
 
-    stream.close();
+    cone_stream.close();
+
+    std::ofstream dcone_stream("seg_dcone_out.txt");
+    if (!dcone_stream)
+    {
+        std::cerr << "Error opening file for writing!\n";
+        return 1;
+    }
+
+    for (auto &[k, ptr] : dcone_data)
+    {
+        print_segment(ptr, dcone_stream);
+    }
+
+    dcone_stream.close();
 
     // for (int i = 1; i <= 100; ++i) {
 
@@ -111,7 +126,11 @@ int main(int argc, char *argv[])
     // if(result) std::cout << "Found " << test_key << "\n";
     // else std::cout << "Not found " << test_key << "\n";
 
-    for (auto &[k, ptr] : data)
+    for (auto &[k, ptr] : cone_data)
+    {
+        delete ptr;
+    }
+    for (auto &[k, ptr] : dcone_data)
     {
         delete ptr;
     }
