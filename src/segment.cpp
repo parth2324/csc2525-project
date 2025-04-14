@@ -45,7 +45,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_cone(float* data, int size,
                     loc += 1;
                 }
                 if(ind < size){
-                    seg = new Segment(curr, loc, data[ind - loc], 0);
+                    seg = new Segment(curr, loc, 0);
                     res.emplace_back(data[ind - 1], seg);
                 }
             }
@@ -58,11 +58,11 @@ std::vector<std::pair<float, Segment*>> gen_segments_cone(float* data, int size,
                 if(size - ind == 1) break;
                 while(ind < size){
                     dlt = data[ind] - st;
-                    up = (int)(slhigh * dlt);
-                    dn = (int)(sllow * dlt);
+                    up = round(slhigh * dlt);
+                    dn = round(sllow * dlt);
                     // std::cout << "y: " << loc << ", y_high: " << up << ", y_low: " << dn << ", slh: " << slhigh << ", sll: " << sllow << "\n";
                     if(loc > up || loc < dn){
-                        seg = new Segment(curr, loc, data[ind - loc], (slhigh + sllow) / 2);
+                        seg = new Segment(curr, loc, (slhigh + sllow) / 2);
                         res.emplace_back(data[ind - 1], seg);
                         break;
                     }
@@ -80,12 +80,12 @@ std::vector<std::pair<float, Segment*>> gen_segments_cone(float* data, int size,
             break;
         }
     }
-    seg = new Segment(curr, loc, data[ind - loc], (slhigh + sllow) / 2);
+    seg = new Segment(curr, loc, (slhigh + sllow) / 2);
     res.emplace_back(data[ind - 1], seg);
     return res;
 }
 
-std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size, int err){
+std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size, int err){
     std::vector<std::pair<float, Segment*>> res;
     if(size == 0) return res;
     Segment* seg;
@@ -100,7 +100,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
         ind += 1;
         if(size - ind > 0){
             dlt = data[ind] - st;
-            // need to set st_up, st_dn, slup, sldn, loc, avg_dlt
+            // need to set st_up, st_dn, slup, sldn, loc
             dup_cnt = 0;
             while(dlt == 0 && ind < size){
                 dlt = data[ind] - st;
@@ -113,7 +113,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
                     // not possible to include all, cut losses
                     ind -= (dup_cnt - err);
                     dup_cnt = err;
-                    seg = new Segment(curr, dup_cnt + 1, data[ind - dup_cnt - 1], 0);
+                    seg = new Segment(curr, dup_cnt + 1, 0);
                     res.emplace_back(data[ind - 1], seg);
                     goto Make_Segment;
                 }
@@ -168,11 +168,11 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
                             m_dec = true;
                         }
                     }
-                    seg = new Segment(curr, j, st, m);
+                    seg = new Segment(curr, j, m);
                     res.emplace_back(data[i - 1], seg);
                     if(i < ind){
                         // break computed segment :(
-                        std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << "% of total)\n";
+                        std::cerr << "Lost " << (ind - i) << " iterations (" << (ind - i) * 100.0 / size << "% of total)\n";
                         ind = i;
                     }
                     break;
@@ -190,8 +190,8 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
             break;
         }
     }
-    m = (slup + sldn) / 2;
     if(loc > 2){
+        m = (slup + sldn) / 2;
         int i = ind - loc, j, prd;
         m_inc = false;
         m_dec = false;
@@ -209,7 +209,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
                 m_dec = true;
             }
         }
-        seg = new Segment(curr, j, st, m);
+        seg = new Segment(curr, j, m);
         res.emplace_back(data[i - 1], seg);
         if(i < ind){
             // break computed segment :(
@@ -219,7 +219,9 @@ std::vector<std::pair<float, Segment*>> gen_segments_irng(float* data, int size,
         }
     }
     else{
-        seg = new Segment(curr, loc, st, m);
+        if(loc == 2) m = 1 / ((*(curr + 1)) - (*curr));
+        else m = 0;
+        seg = new Segment(curr, loc, m);
         res.emplace_back(data[ind - 1], seg);
     }
     return res;
