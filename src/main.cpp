@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
     NUM_VALS = std::stoi(argv[1]);
     MAX_ERR = std::stoi(argv[2]);
 
-    // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
-    // for (int i = 0; i < NUM_VALS; i++)
-    // {
-    //     vals[i] = gen_func(i);
-    // }
+    float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
+    for (int i = 0; i < NUM_VALS; i++)
+    {
+        vals[i] = gen_func(i);
+    }
 
     // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
     // int rep_cnt = 0.7 * NUM_VALS;
@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
     //     vals[i] = 1+ gen_func(i);
     // }
 
-    int N = 5;
-    NUM_VALS = 4 + (N * (MAX_ERR + 2));
-    float* vals = gen_edgecase(MAX_ERR, N);
+    // int N = 5;
+    // NUM_VALS = 4 + (N * (MAX_ERR + 2));
+    // float* vals = gen_edgecase(MAX_ERR, N);
 
     std::vector<std::pair<float, Segment *>> cone_data = gen_segments_cone(vals, NUM_VALS, MAX_ERR);
     std::vector<std::pair<float, Segment *>> dcone_data = gen_segments_dcone(vals, NUM_VALS, MAX_ERR);

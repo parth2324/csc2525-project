@@ -172,7 +172,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size
                     res.emplace_back(data[i - 1], seg);
                     if(i < ind){
                         // break computed segment :(
-                        std::cerr << "Lost " << (ind - i) << " iterations (" << (ind - i) * 100.0 / size << "% of total)\n";
+                        std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << " of total)\n";
                         ind = i;
                     }
                     break;
@@ -213,7 +213,7 @@ std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size
         res.emplace_back(data[i - 1], seg);
         if(i < ind){
             // break computed segment :(
-            std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << "% of total)\n";
+            std::cerr << "Lost " << (ind - i) << " iterations (" << (float)(ind - i) / size << " of total)\n";
             ind = i;
             goto Make_Segment;
         }
