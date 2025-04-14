@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17
 
-.PHONY: all clean run
+.PHONY: all clean
 
 all: run
 
