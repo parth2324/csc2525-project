@@ -143,12 +143,12 @@ std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size
                 ind += 1;
                 loc = 2;
             }
-            std::cout << "--------------------\n";
+            // std::cout << "--------------------\n";
             while(ind < size){
                 dlt = data[ind] - st;
                 up = round(slup * dlt) + st_dn;
                 dn = round(sldn * dlt) + st_up;
-                std::cout << "y: " << loc << ", y_high: " << up << ", y_low: " << dn << ", slup: " << slup << ", sldn: " << sldn << ", stup: " << st_up << ", stdn: " << st_dn << "\n";
+                // std::cout << "y: " << loc << ", y_high: " << up << ", y_low: " << dn << ", slup: " << slup << ", sldn: " << sldn << ", stup: " << st_up << ", stdn: " << st_dn << "\n";
                 if(loc - err > up || loc + err < dn){
                     m = (slup + sldn) / 2;
                     int i = ind - loc, j, prd;

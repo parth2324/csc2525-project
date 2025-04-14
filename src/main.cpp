@@ -71,10 +71,6 @@ int main(int argc, char *argv[])
     int N = 5;
     NUM_VALS = 4 + (N * (MAX_ERR + 2));
     float* vals = gen_edgecase(MAX_ERR, N);
-    for (int i = 0; i < NUM_VALS; i++)
-    {
-        std::cout << vals[i] << "\n";
-    }
 
     std::vector<std::pair<float, Segment *>> cone_data = gen_segments_cone(vals, NUM_VALS, MAX_ERR);
     std::vector<std::pair<float, Segment *>> dcone_data = gen_segments_dcone(vals, NUM_VALS, MAX_ERR);
