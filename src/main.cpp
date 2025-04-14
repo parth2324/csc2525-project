@@ -6,15 +6,15 @@
 #include "segment.h"
 
 float gen_func(int ind){
-    // if(ind <= 11) return ind * ind * ind;
-    // ind -= 11;
-    // return (11 * 11 * 11) + (ind * ind * ind);
-    float v = 3 * ind + 2;
-    if(ind < 7){
-        return ind / v;
-    }
+    if(ind <= 6) return ind * ind * ind;
     ind -= 6;
-    return ((ind + 6) / v) + (ind * ind * ind);
+    return (6*6*6) + (ind * ind * ind);
+    // float v = 3 * ind + 2;
+    // if(ind < 7){
+    //     return ind / v;
+    // }
+    // ind -= 6;
+    // return ((ind + 6) / v) + (ind * ind * ind);
 }
 
 float* gen_edgecase(int E, int N){
@@ -58,14 +58,14 @@ int main(int argc, char *argv[])
     }
 
     // float* vals = (float*) malloc(sizeof(float) * NUM_VALS);
-    // int rep_cnt = 0.7 * NUM_VALS;
+    // int rep_cnt = 0.3 * NUM_VALS;
     // for (int i = 0; i < rep_cnt; i++)
     // {
-    //     vals[i] = 1;
+    //     vals[i] = gen_func(i);
     // }
     // for (int i = rep_cnt; i < NUM_VALS; i++)
     // {
-    //     vals[i] = 1+ gen_func(i);
+    //     vals[i] = 1 + gen_func(rep_cnt - 1);
     // }
 
     // int N = 5;

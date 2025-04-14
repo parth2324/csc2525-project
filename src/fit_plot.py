@@ -48,7 +48,7 @@ plt.savefig("cone_fit_plot.png")
 
 plt.figure()
 collec = read_segments("seg_dcone_out.txt")
-print("Number of cone segements read:", len(collec))
+print("Number of dcone segements read:", len(collec))
 for slp, seg in collec:
     plot_segment_fit(seg, slp, True)
 
