@@ -8,10 +8,31 @@
 // const float FLT_INF = std::numeric_limits<float>::infinity();
 // const float INT_INF = std::numeric_limits<int>::max();
 
-float* search_segment(Segment* segment, float key){
-    for(int i = 0; i < segment->size; i++){
-        if(segment->data[i] == key) return (segment->data + i);
+float* search_segment(Segment* segment, float key, int E){
+    float val = segment->data[0];
+    // quick return if key doesn't exist
+    if(key < val || key > *(segment->last)) return nullptr;
+    int m = round(segment->slp * (key - val)), l, r;
+    val = segment->data[m];
+    // checking original prediction
+    if (val == key) return segment->data + m;
+    else if(val < key){
+        l = m + 1;
+        r = m + E;
     }
+    else{
+        l = m - E;
+        r = m - 1;
+    }
+    // binary search in reduced range
+    while(l <= r){
+        m = (l + r) >> 1;
+        val = segment->data[m];
+        if (val == key) return segment->data + m;
+        else if (val < key) l = m + 1;
+        else r = m - 1;
+    }
+    // key not found
     return nullptr;
 }
 
