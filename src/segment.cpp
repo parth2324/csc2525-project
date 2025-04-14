@@ -234,7 +234,8 @@ std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size
                      * 
                      * We thus, check all error bounds are satified, and further allow mutating 
                      * the gradient for our linear predictor only in one direction, supporting
-                     * correction for curvature leaks only on one side.
+                     * correction for curvature leaks only on one side. We informally argue the
+                     * correctness in the report.
                      * 
                      * After this pass, we finally add the segment.
                      */
@@ -278,9 +279,9 @@ std::vector<std::pair<float, Segment*>> gen_segments_dcone(float* data, int size
                          * bound E. Thus, we simply break our segment maximally, and give away 
                          * the rest for reprocessing.
                          * 
-                         * Potential work is to be done here, exploring ways to use information
-                         * computed in first pass, or reduce false positive rates without sacrificing
-                         * the optimality double cone algorithm brings.
+                         * NOTE: Potential work is to be done here, exploring ways to use
+                         * information computed in first pass, or reduce false positive rates 
+                         * without sacrificing the optimality double cone algorithm brings.
                          */
                         lost_iters += ind - i;
                         ind = i;
