@@ -38,8 +38,13 @@ def plot_segment_fit(segment, slope, error_lines=True):
 
 collec = read_segments("seg_cone_out.txt")
 print("Number of cone segements read:", len(collec))
+CNT_MAX = 2
+CNT = CNT_MAX
 for slp, seg in collec:
     plot_segment_fit(seg, slp, True)
+    CNT -= 1
+    if CNT == 0:
+        break
 
 plt.xlabel('Keys')
 plt.ylabel('Location')
@@ -49,8 +54,12 @@ plt.savefig("cone_fit_plot.png")
 plt.figure()
 collec = read_segments("seg_dcone_out.txt")
 print("Number of dcone segements read:", len(collec))
+CNT = CNT_MAX
 for slp, seg in collec:
     plot_segment_fit(seg, slp, True)
+    CNT -= 1
+    if CNT == 0:
+        break
 
 plt.xlabel('Keys')
 plt.ylabel('Location')
