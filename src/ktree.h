@@ -8,7 +8,7 @@
 struct Node
 {
     std::vector<float> keys;
-    std::vector<Segment*> values;
+    std::vector<Segment *> values;
     std::vector<std::unique_ptr<Node>> children;
 
     bool is_leaf() const
@@ -21,22 +21,22 @@ template <int K>
 class KTree
 {
     std::unique_ptr<Node> root;
-    std::unique_ptr<Node> build_recursive(const std::vector<std::pair<float, Segment*>> &entries, int left, int right);
+    std::unique_ptr<Node> build_recursive(const std::vector<std::pair<float, Segment *>> &entries, int left, int right);
 
 public:
-    void build(const std::vector<std::pair<float, Segment*>> &sorted_entries);
+    void build(const std::vector<std::pair<float, Segment *>> &sorted_entries);
     Segment *search_tree(float key) const;
-    float* lookup(float key) const
+    float *lookup(float key, int error) const
     {
         Segment *seg = search_tree(key);
         if (seg)
-            return search_segment(seg, key);
+            return search_segment(seg, key, error);
         return nullptr;
     }
 };
 
 template <int K>
-std::unique_ptr<Node> KTree<K>::build_recursive(const std::vector<std::pair<float, Segment*>> &entries, int left, int right)
+std::unique_ptr<Node> KTree<K>::build_recursive(const std::vector<std::pair<float, Segment *>> &entries, int left, int right)
 {
     int n = right - left;
     if (n == 0)
