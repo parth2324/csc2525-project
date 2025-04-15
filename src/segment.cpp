@@ -176,7 +176,6 @@ std::vector<std::pair<float, Segment *>> gen_segments_dcone(float *data, int siz
     float *curr, st, dlt, st_up, st_dn, m;
     int loc, up, dn, lost_iters = 0, ind = 0;
     float slup, sldn;
-    bool m_inc, m_dec; // TO_REMOVE_DONE = false;
 Make_Segment:
     while (ind < size)
     {
@@ -290,68 +289,18 @@ Make_Segment:
                      * for details on "curvature leaks", the cause of "false positive"
                      * additions.
                      *
-                     * We thus, check all error bounds are satified, and further allow mutating
-                     * the gradient for our linear predictor only in one direction, supporting
-                     * correction for curvature leaks only on one side. We informally argue the
-                     * correctness in the report.
+                     * We thus, check all error bounds are satified, calling recomputation
+                     * for invalid tails.
                      *
                      * After this pass, we finally add the segment.
                      */
+
                     m = (slup + sldn) / 2;
                     int i = ind - loc, j, prd;
-                    m_inc = false;
-                    m_dec = false;
-                    // bool has_enter = false;
-                    // int min_index = 0, min_dlt = 0;
                     for (j = 0; i < ind; j++, i++)
                     {
                         dlt = data[i] - st;
                         prd = round(m * dlt);
-
-                        // if (j - E > prd)
-                        // {
-                        //     if (m_dec)
-                        //         break;
-                            
-                        //     if(TO_REMOVE_DONE) break;
-
-                        //     if(!has_enter) std::cout << "NEW SEGMENT\n";
-                        //     has_enter = true;
-
-                        //     std::cout << "Try: " << data[i] << " " << st << " " << dlt << " " << m << " " << prd << " " << j << "\n";
-                        //     if(min_index - E > round(((j - E) / dlt) * min_dlt)){
-                        //         std::cout << "Block: " << min_dlt << " " << round(((j - E) / dlt) * min_dlt) << " " << min_index << "\n";
-                        //         // break;
-                        //     }
-                        //     m = (j - E) / dlt;
-                        //     m_inc = true;
-                        //     int ii = ind - loc;
-                        //     for (int k = 0; k < j; k++, ii++)
-                        //     {
-                        //         dlt = data[ii] - st;
-                        //         prd = round(m * dlt);
-                        //         if (k - E > prd || k + E < prd)
-                        //         {
-                        //             std::cout << "Err: " << data[ii] << " " << st << " " << dlt << " " << m << " " << prd << " " << k << "\n";
-                        //             TO_REMOVE_DONE = true;
-                        //         }
-                        //     }
-
-                        // }
-
-                        // if(j - E - (m * (data[i] - st)) < min_index - E - (m * min_dlt)){
-                        //     min_index = j;
-                        //     min_dlt = data[i] - st;
-                        // }
-
-                        // if (j + E < prd)
-                        // {
-                        //     if (m_inc)
-                        //         break;
-                        //     m = (j + E) / dlt;
-                        //     m_dec = true;
-                        // }
-
                         if (j - E > prd || j + E < prd) break;
                     }
 
@@ -416,26 +365,11 @@ Make_Segment:
          */
         m = (slup + sldn) / 2;
         int i = ind - loc, j, prd;
-        m_inc = false;
-        m_dec = false;
         for (j = 0; i < ind; j++, i++)
         {
             dlt = data[i] - st;
             prd = round(m * dlt);
-            if (j - E > prd)
-            {
-                if (m_dec)
-                    break;
-                m = (j - E) / dlt;
-                m_inc = true;
-            }
-            if (j + E < prd)
-            {
-                if (m_inc)
-                    break;
-                m = (j + E) / dlt;
-                m_dec = true;
-            }
+            if (j - E > prd || j + E < prd) break;
         }
         seg = new Segment(curr, j, m);
         res.emplace_back(data[i - 1], seg);
