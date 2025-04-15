@@ -59,3 +59,4 @@ dkms.conf
 # Large files
 *.csv
 *.osm*
+*.txt
